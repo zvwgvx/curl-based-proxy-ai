@@ -40,15 +40,17 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         // Read per-request overrides from headers (fallback to .env inside processWithModel)
         const headerReasoningEffort = req.headers['x-reasoning-effort'] || null;
         const headerMaxTokens = req.headers['x-max-tokens'] ? parseInt(req.headers['x-max-tokens'], 10) : null;
+        const headerModel = req.headers['x-model'] || null;
 
         res.json({
             message: "File received and is being processed.",
+            model: headerModel || process.env.MODEL || "openai/gpt-3.5-turbo",
             reasoning_effort: headerReasoningEffort || process.env.REASONING_EFFORT || null,
             max_tokens: headerMaxTokens || parseInt(process.env.MAX_TOKENS || '2048', 10)
         });
 
         // Call the model API in the background
-        processWithModel(fileContent, { reasoningEffort: headerReasoningEffort, maxTokens: headerMaxTokens });
+        processWithModel(fileContent, { reasoningEffort: headerReasoningEffort, maxTokens: headerMaxTokens, model: headerModel });
 
     } catch (err) {
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
@@ -82,7 +84,7 @@ async function processWithModel(userText, overrides = {}) {
 
         const apiBase = (process.env.API_BASE || "https://openrouter.ai/api/v1").replace(/\/$/, '');
         const apiKey = process.env.API_KEY || "";
-        const model = process.env.MODEL || "openai/gpt-3.5-turbo";
+        const model = overrides.model ?? process.env.MODEL ?? "openai/gpt-3.5-turbo";
         // Per-request header values take priority over .env
         const maxTokens = overrides.maxTokens ?? parseInt(process.env.MAX_TOKENS || '2048', 10);
         const temperature = parseFloat(process.env.TEMPERATURE || '0.7');
