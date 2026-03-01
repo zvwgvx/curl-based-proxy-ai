@@ -6,6 +6,7 @@ const path = require('path');
 
 const app = express();
 const port = parseInt(process.env.PORT || '1402', 10);
+const host = process.env.HOST || '0.0.0.0';
 
 // Configure multer to store uploaded files temporarily in the 'uploads' folder
 const upload = multer({ dest: 'uploads/' });
@@ -140,8 +141,8 @@ async function processWithModel(userText, overrides = {}) {
     }
 }
 
-app.listen(port, () => {
-    console.log(`Server is listening at http://localhost:${port}`);
+app.listen(port, host, () => {
+    console.log(`Server is listening at http://${host}:${port}`);
     console.log("Endpoint POST /upload : Upload a txt file for processing");
     console.log("Endpoint GET  /status : Check system status");
     console.log("Endpoint GET  /output : Download the output.txt result");
