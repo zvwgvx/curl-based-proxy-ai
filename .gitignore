@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# System prompt
+instruct.txt
+
+# Uploaded files (temporary)
+uploads/
+
+# Output
+output.txt
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
